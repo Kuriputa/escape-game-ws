@@ -2,6 +2,7 @@
 
 export const EVENT_CODES = {
   CHAT: 98,
+  START: 97,
   PING: 0,
   PUZZLE_UPDATE: 1,
   INK_SET: 2,
@@ -15,6 +16,7 @@ export class Net {
   private isJoiningRoom = false;
   private nickname: string = "";
   onJoined?: (roomName: string) => void;
+  onPlayersChanged?: (players: string[]) => void;
 
   constructor() {
     const appVersion = import.meta.env.VITE_PHOTON_APP_VERSION || "1.0";
@@ -40,8 +42,13 @@ export class Net {
       // Callback lorsqu'on rejoint une room
       if (this.client.isJoinedToRoom && this.client.isJoinedToRoom() && this.desiredRoomName) {
         this.onJoined?.(this.desiredRoomName);
+        this.notifyPlayers();
       }
     };
+
+    // Ecoute des changements d'acteurs
+    this.client.onActorJoin = () => this.notifyPlayers();
+    this.client.onActorLeave = () => this.notifyPlayers();
   }
 
   async connect(region = import.meta.env.VITE_PHOTON_REGION || "eu") {
@@ -81,5 +88,24 @@ export class Net {
 
   sendChat(message: string) {
     this.send(EVENT_CODES.CHAT, { from: this.nickname, text: message, t: Date.now() });
+  }
+
+  startGame() {
+    this.send(EVENT_CODES.START, { by: this.nickname, t: Date.now() });
+  }
+
+  private notifyPlayers() {
+    try {
+      const actorsMap = this.client.myRoomActors ? this.client.myRoomActors() : this.client.actors;
+      const players: string[] = [];
+      if (actorsMap) {
+        const values = Array.isArray(actorsMap) ? actorsMap : Object.values(actorsMap);
+        for (const a of values as any[]) {
+          const name = a?.name || a?.getName?.() || a?.userId || "Inconnu";
+          players.push(name);
+        }
+      }
+      this.onPlayersChanged?.(players);
+    } catch {}
   }
 }

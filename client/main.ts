@@ -17,10 +17,14 @@ const net = new Net();
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: 800,
-  height: 480,
   parent: document.body,
   backgroundColor: "#111",
+  scale: {
+    mode: Phaser.Scale.RESIZE,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: window.innerWidth,
+    height: window.innerHeight,
+  },
   scene: {
     async create() {
       // Helper: afficher une erreur à l'écran pour éviter la page blanche
@@ -34,11 +38,9 @@ const config: Phaser.Types.Core.GameConfig = {
         console.error(err);
       };
 
-      // Titre de la scène
-      this.add.text(20, 20, "Escape Game - Démo réseau + narration", {
-        font: "20px Arial",
-        color: "#ffffff",
-      });
+      // Masque le canvas tant que la partie n'a pas commencé
+      const canvas = this.game.canvas as HTMLCanvasElement;
+      canvas.style.display = "none";
 
       // UI elements from DOM
       const menuEl = document.getElementById("menu") as HTMLDivElement;
@@ -50,6 +52,10 @@ const config: Phaser.Types.Core.GameConfig = {
       const chatLog = document.getElementById("chatLog") as HTMLDivElement;
       const chatInput = document.getElementById("chatInput") as HTMLInputElement;
       const chatSend = document.getElementById("chatSend") as HTMLButtonElement;
+      const lobbyEl = document.getElementById("lobby") as HTMLDivElement;
+      const lobbyRoom = document.getElementById("lobbyRoom") as HTMLDivElement;
+      const playersList = document.getElementById("players") as HTMLUListElement;
+      const startBtn = document.getElementById("startBtn") as HTMLButtonElement;
 
       // Join flow
       joinBtn.onclick = async () => {
@@ -73,7 +79,31 @@ const config: Phaser.Types.Core.GameConfig = {
       net.onJoined = (room) => {
         menuEl.style.display = "none";
         chatBox.style.display = "block";
+        lobbyEl.style.display = "flex";
+        lobbyRoom.textContent = `Room: ${room}`;
         appendChatLine(`Vous avez rejoint: ${room}`);
+      };
+
+      net.onPlayersChanged = (players) => {
+        playersList.innerHTML = "";
+        for (const p of players) {
+          const li = document.createElement("li");
+          li.textContent = p || "(sans nom)";
+          playersList.appendChild(li);
+        }
+      };
+
+      const begin = () => {
+        canvas.style.display = "block";
+        lobbyEl.style.display = "none";
+        // au début, on affiche le premier paragraphe
+        renderInk(currentInkText);
+        appendChatLine("Départ de la partie !");
+      };
+
+      startBtn.onclick = () => {
+        net.startGame();
+        begin();
       };
 
       // Chat
@@ -91,30 +121,7 @@ const config: Phaser.Types.Core.GameConfig = {
         chatInput.value = "";
       };
 
-      this.add.text(20, 60, "Connecté à Photon (ROOM-TEST)", {
-        font: "14px Arial",
-        color: "#aaaaaa",
-      });
-
-      // 2️⃣ Bouton test "Envoyer PING"
-      const btn = this.add
-        .text(20, 100, "[ Envoyer PING ]", {
-          font: "16px Arial",
-          color: "#00ff00",
-        })
-        .setDepth(1000);
-
-      // Hit area explicite + curseur
-      btn.setInteractive(
-        new Phaser.Geom.Rectangle(0, 0, btn.width + 12, btn.height + 8),
-        Phaser.Geom.Rectangle.Contains
-      );
-      btn.input!.cursor = "pointer";
-
-      btn.on("pointerdown", () => {
-        console.log("CLICK PING");
-        net.send(EVENT_CODES.PING, { t: Date.now() });
-      });
+      // On supprime le bouton PING de la démo pour l'écran d'attente
 
       // 3️⃣ Chargement de l’histoire Ink
       let story: Story | null = null;
@@ -141,11 +148,10 @@ const config: Phaser.Types.Core.GameConfig = {
           .setName("ink");
       };
 
-      // Premier affichage du texte Ink
+      // Prépare le premier affichage du texte Ink (affiché au démarrage de partie)
       let firstText = "";
       while (story.canContinue) firstText += story.Continue();
       let currentInkText = firstText;
-      renderInk(currentInkText);
 
       // 4️⃣ Réception d’un événement réseau
       net.onEvent = (code, data) => {
@@ -164,15 +170,12 @@ const config: Phaser.Types.Core.GameConfig = {
           }
         } else if (code === EVENT_CODES.CHAT) {
           appendChatLine(`${data.from || "Inconnu"}: ${data.text}`);
+        } else if (code === EVENT_CODES.START) {
+          begin();
+          appendChatLine(`La partie démarre (par ${data.by || "?"}) !`);
         }
       };
 
-      this.add.text(
-        20,
-        440,
-        "Ouvre un 2e onglet → clique sur [Envoyer PING] pour tester la synchro.",
-        { font: "12px Arial", color: "#999999" }
-      );
     },
   },
 };
