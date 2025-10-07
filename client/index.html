@@ -6,7 +6,32 @@
     <title>Escape Game - Prototype</title>
   </head>
   <body>
+    <!-- Photon Realtime browser SDK (global Photon) -->
+    <script src="/vendor/photon/photon.min.js"></script>
     
+    <!-- UI: Menu principal -->
+    <div id="menu" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:16px;background:#0b0b0bcc;color:#fff;font-family:Arial,Helvetica,sans-serif;z-index:2000;">
+      <div style="background:#1e1e1e;padding:20px 24px;border-radius:8px;min-width:320px;max-width:90vw;">
+        <h2 style="margin:0 0 12px 0;font-size:18px;">Rejoindre une salle</h2>
+        <label style="display:block;margin-bottom:8px;font-size:12px;opacity:.9;">Pseudo</label>
+        <input id="nickname" type="text" placeholder="Ex: Alex" style="width:100%;padding:8px;border-radius:4px;border:1px solid #333;background:#111;color:#fff;">
+        <label style="display:block;margin:12px 0 8px 0;font-size:12px;opacity:.9;">Nom de salle</label>
+        <input id="room" type="text" placeholder="Ex: ROOM-TEST" style="width:100%;padding:8px;border-radius:4px;border:1px solid #333;background:#111;color:#fff;">
+        <button id="joinBtn" style="margin-top:14px;width:100%;padding:10px;border:0;border-radius:4px;background:#2f8cff;color:#fff;font-weight:600;cursor:pointer;">Rejoindre</button>
+        <div id="menuError" style="margin-top:8px;color:#ff6666;font-size:12px;display:none;"></div>
+      </div>
+    </div>
+
+    <!-- UI: Chat overlay -->
+    <div id="chat" style="position:absolute;right:12px;bottom:12px;width:300px;background:#1e1e1e;color:#fff;border:1px solid #333;border-radius:8px;display:none;z-index:2000;font-family:Arial,Helvetica,sans-serif;">
+      <div style="padding:8px 10px;border-bottom:1px solid #333;font-weight:700;">Chat</div>
+      <div id="chatLog" style="height:180px;overflow:auto;padding:8px 10px;font-size:12px;line-height:1.35;background:#111;"></div>
+      <div style="display:flex;gap:6px;padding:8px 10px;border-top:1px solid #333;">
+        <input id="chatInput" type="text" placeholder="Votre message..." style="flex:1;padding:8px;border-radius:4px;border:1px solid #333;background:#0b0b0b;color:#fff;">
+        <button id="chatSend" style="padding:8px 10px;border:0;border-radius:4px;background:#2f8cff;color:#fff;font-weight:600;cursor:pointer;">Envoyer</button>
+      </div>
+    </div>
+
     <script type="module" src="/main.ts"></script>
   </body>
 </html>
