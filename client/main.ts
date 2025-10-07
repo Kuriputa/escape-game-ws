@@ -2,47 +2,13 @@
 // Imports
 // -------------------------
 import Phaser from "phaser";
-import { LoadBalancingClient, ClientState } from "photon-realtime";
+import { Net, EVENT_CODES } from "./src/net/photonClient";
 import { Story } from "inkjs";
 import storyJSON from "./src/ink/story.json"; // JSON exporté depuis Inky/Inklecate
 
-// -------------------------
-// Codes d'événements
-// -------------------------
-const EVENT_CODES = {
-  PING: 0,
-  PUZZLE_UPDATE: 1,
-  INK_SET: 2,
-  CHOICE_MADE: 3,
-} as const;
+// Codes d'événements importés depuis Net
 
-// -------------------------
-// Classe réseau Photon
-// -------------------------
-class Net {
-  client = new LoadBalancingClient("wss://", "1.0");
-  onEvent?: (code: number, data: any) => void;
-
-  constructor() {
-    this.client.onEvent = (code, content) => this.onEvent?.(code, content);
-    this.client.onStateChange = (s) => console.log("Photon state:", s);
-  }
-
-  async connect(region = "eu") {
-    await this.client.connectToRegionMaster(region);
-  }
-
-  async joinOrCreateRoom(roomName: string) {
-    if (this.client.state !== ClientState.JoinedLobby) {
-      await this.client.connectToRegionMaster("eu");
-    }
-    this.client.joinOrCreateRoom(roomName);
-  }
-
-  send(code: number, payload: any) {
-    this.client.raiseEvent(code, payload);
-  }
-}
+// Réseau Photon importé depuis src/net/photonClient
 
 // -------------------------
 // Jeu Phaser
