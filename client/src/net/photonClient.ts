@@ -1,4 +1,3 @@
-// src/net/photon.ts
 import { LoadBalancingClient, ClientState } from "photon-realtime";
 
 export const EVENT_CODES = {
@@ -10,20 +9,27 @@ export const EVENT_CODES = {
 } as const;
 
 export class Net {
-  client = new LoadBalancingClient("wss://", "1.0"); // AppVersion (à ta convenance)
+  client: LoadBalancingClient;
   onEvent?: (code: number, data: any) => void;
 
   constructor() {
+    const appVersion = import.meta.env.VITE_PHOTON_APP_VERSION || "1.0";
+    this.client = new LoadBalancingClient("wss://", appVersion);
+
+    // logs utiles
     this.client.onEvent = (code, content) => this.onEvent?.(code, content);
     this.client.onStateChange = (s) => console.log("Photon state:", s);
   }
 
-  async connect(region = "eu") {
-    await this.client.connectToRegionMaster(region); // utilise ton AppId configuré côté Photon
+  async connect(region = import.meta.env.VITE_PHOTON_REGION || "eu") {
+    // photon-realtime ^4.4.0 connectToRegionMaster(region) signature
+    await this.client.connectToRegionMaster(region);
   }
 
   async joinOrCreateRoom(roomName: string) {
-    if (this.client.state !== ClientState.JoinedLobby) await this.client.connectToRegionMaster("eu");
+    if (this.client.state !== ClientState.JoinedLobby) {
+      await this.connect(import.meta.env.VITE_PHOTON_REGION || "eu");
+    }
     this.client.joinOrCreateRoom(roomName);
   }
 
