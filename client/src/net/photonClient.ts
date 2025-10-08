@@ -7,6 +7,7 @@ export const EVENT_CODES = {
   PUZZLE_UPDATE: 1,
   INK_SET: 2,
   CHOICE_MADE: 3,
+  ITEM_PICKED: 10,
 } as const;
 
 export class Net {
@@ -30,7 +31,10 @@ export class Net {
     this.client.setAppVersion(appVersion);
 
     // logs utiles
-    this.client.onEvent = (code: number, content: any) => this.onEvent?.(code, content);
+    this.client.onEvent = (code: number, content: any) => {
+      console.log("Photon event received:", code, content);
+      this.onEvent?.(code, content);
+    };
     this.client.onStateChange = (s: number) => {
       console.log("Photon state:", s);
       // Si on vient d'entrer dans le lobby, lancer le join de la room souhaitée

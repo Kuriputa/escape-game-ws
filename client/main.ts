@@ -5,6 +5,9 @@ import Phaser from "phaser";
 import { Net, EVENT_CODES } from "./src/net/photonClient";
 import { Story } from "inkjs";
 import storyJSON from "./src/ink/story.json"; // JSON exporté depuis Inky/Inklecate
+import { HospitalRoomScene } from "./src/scenes/HospitalRoomScene";
+import { CorridorScene } from "./src/scenes/CorridorScene";
+import { ComputerRoomScene } from "./src/scenes/ComputerRoomScene";
 
 // Codes d'événements importés depuis Net
 
@@ -24,6 +27,13 @@ const config: Phaser.Types.Core.GameConfig = {
     autoCenter: Phaser.Scale.CENTER_BOTH,
     width: window.innerWidth,
     height: window.innerHeight,
+  },
+  physics: {
+    default: "arcade",
+    arcade: {
+      gravity: { y: 0, x: 0 },
+      debug: false,
+    },
   },
   scene: {
     async create() {
@@ -96,9 +106,17 @@ const config: Phaser.Types.Core.GameConfig = {
       const begin = () => {
         canvas.style.display = "block";
         lobbyEl.style.display = "none";
-        // au début, on affiche le premier paragraphe
-        renderInk(currentInkText);
+        // Garder le chat visible pendant la partie
+        chatBox.style.display = "block";
         appendChatLine("Départ de la partie !");
+        
+        // Ajouter toutes les scènes
+        this.scene.add("HospitalRoomScene", HospitalRoomScene, false);
+        this.scene.add("CorridorScene", CorridorScene, false);
+        this.scene.add("ComputerRoomScene", ComputerRoomScene, false);
+        
+        // Lancer la scène HospitalRoomScene
+        this.scene.start("HospitalRoomScene", { net, story });
       };
 
       startBtn.onclick = () => {
@@ -113,12 +131,21 @@ const config: Phaser.Types.Core.GameConfig = {
         chatLog.appendChild(line);
         chatLog.scrollTop = chatLog.scrollHeight;
       }
-      chatSend.onclick = () => {
+      
+      const sendChatMessage = () => {
         const msg = (chatInput.value || "").trim();
         if (!msg) return;
         appendChatLine(`Moi: ${msg}`);
         net.sendChat(msg);
         chatInput.value = "";
+      };
+      
+      chatSend.onclick = sendChatMessage;
+      
+      chatInput.onkeydown = (e) => {
+        if (e.key === "Enter") {
+          sendChatMessage();
+        }
       };
 
       // On supprime le bouton PING de la démo pour l'écran d'attente
