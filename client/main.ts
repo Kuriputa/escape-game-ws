@@ -8,6 +8,13 @@ import storyJSON from "./src/ink/story.json"; // JSON exporté depuis Inky/Inkle
 import { HospitalRoomScene } from "./src/scenes/HospitalRoomScene";
 import { CorridorScene } from "./src/scenes/CorridorScene";
 import { ComputerRoomScene } from "./src/scenes/ComputerRoomScene";
+import { CorridorSceneA } from "./src/scenes/CorridorSceneA";
+import { ComputerRoomSceneB } from "./src/scenes/ComputerRoomSceneB";
+import { PatientRoomScene } from "./src/scenes/PatientRoomScene";
+import { MedicineStorageScene } from "./src/scenes/MedicineStorageScene";
+import { ServerRoomScene } from "./src/scenes/ServerRoomScene";
+import { WaitingRoomScene } from "./src/scenes/WaitingRoomScene";
+import { ExitRoomScene } from "./src/scenes/ExitRoomScene";
 
 // Codes d'événements importés depuis Net
 
@@ -96,9 +103,48 @@ const config: Phaser.Types.Core.GameConfig = {
 
       net.onPlayersChanged = (players) => {
         playersList.innerHTML = "";
-        for (const p of players) {
+        for (let i = 0; i < players.length; i++) {
+          const p = players[i];
           const li = document.createElement("li");
-          li.textContent = p || "(sans nom)";
+          li.style.cssText = "padding:10px 12px;margin-bottom:8px;background:#0d0d0d;border-radius:8px;border:2px solid #333;display:flex;align-items:center;gap:10px;font-size:14px;transition:all 0.3s;";
+          
+          // Icône du joueur
+          const icon = document.createElement("span");
+          icon.style.cssText = "font-size:20px;";
+          icon.textContent = i === 0 ? "🎮" : "🎯";
+          
+          // Nom du joueur
+          const name = document.createElement("span");
+          name.style.cssText = "flex:1;font-weight:600;color:#fff;";
+          name.textContent = p || "(sans nom)";
+          
+          // Badge de rôle
+          const badge = document.createElement("span");
+          badge.style.cssText = "padding:4px 8px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:0.5px;";
+          if (i === 0) {
+            badge.style.background = "linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)";
+            badge.style.color = "#fff";
+            badge.textContent = "JOUEUR A";
+          } else {
+            badge.style.background = "linear-gradient(135deg, #3498db 0%, #2980b9 100%)";
+            badge.style.color = "#fff";
+            badge.textContent = "JOUEUR B";
+          }
+          
+          li.appendChild(icon);
+          li.appendChild(name);
+          li.appendChild(badge);
+          
+          // Effet hover
+          li.onmouseenter = () => {
+            li.style.borderColor = "#00d9ff";
+            li.style.transform = "translateX(4px)";
+          };
+          li.onmouseleave = () => {
+            li.style.borderColor = "#333";
+            li.style.transform = "translateX(0)";
+          };
+          
           playersList.appendChild(li);
         }
       };
@@ -114,6 +160,13 @@ const config: Phaser.Types.Core.GameConfig = {
         this.scene.add("HospitalRoomScene", HospitalRoomScene, false);
         this.scene.add("CorridorScene", CorridorScene, false);
         this.scene.add("ComputerRoomScene", ComputerRoomScene, false);
+        this.scene.add("CorridorSceneA", CorridorSceneA, false);
+        this.scene.add("ComputerRoomSceneB", ComputerRoomSceneB, false);
+        this.scene.add("PatientRoomScene", PatientRoomScene, false);
+        this.scene.add("MedicineStorageScene", MedicineStorageScene, false);
+        this.scene.add("ServerRoomScene", ServerRoomScene, false);
+        this.scene.add("WaitingRoomScene", WaitingRoomScene, false);
+        this.scene.add("ExitRoomScene", ExitRoomScene, false);
         
         // Lancer la scène HospitalRoomScene
         this.scene.start("HospitalRoomScene", { net, story });
@@ -125,9 +178,33 @@ const config: Phaser.Types.Core.GameConfig = {
       };
 
       // Chat
-      function appendChatLine(text: string) {
+      function appendChatLine(text: string, type: "system" | "self" | "other" = "system") {
         const line = document.createElement("div");
-        line.textContent = text;
+        line.style.cssText = "padding:8px 10px;margin-bottom:6px;border-radius:8px;font-size:13px;line-height:1.4;animation:fadeIn 0.3s ease-out;";
+        
+        if (type === "system") {
+          line.style.background = "#1a1a2e";
+          line.style.borderLeft = "3px solid #00d9ff";
+          line.style.color = "#aaa";
+          line.innerHTML = `<span style="color:#00d9ff;font-weight:700;">ℹ️ Système:</span> ${text}`;
+        } else if (type === "self") {
+          line.style.background = "#0d2818";
+          line.style.borderLeft = "3px solid #27ae60";
+          line.style.color = "#fff";
+          line.style.textAlign = "right";
+          line.innerHTML = `<span style="color:#27ae60;font-weight:700;">Vous:</span> ${text}`;
+        } else if (type === "other") {
+          line.style.background = "#2a1a1a";
+          line.style.borderLeft = "3px solid #e74c3c";
+          line.style.color = "#fff";
+          const parts = text.split(":", 2);
+          if (parts.length === 2) {
+            line.innerHTML = `<span style="color:#e74c3c;font-weight:700;">${parts[0]}:</span> ${parts[1]}`;
+          } else {
+            line.textContent = text;
+          }
+        }
+        
         chatLog.appendChild(line);
         chatLog.scrollTop = chatLog.scrollHeight;
       }
@@ -135,7 +212,7 @@ const config: Phaser.Types.Core.GameConfig = {
       const sendChatMessage = () => {
         const msg = (chatInput.value || "").trim();
         if (!msg) return;
-        appendChatLine(`Moi: ${msg}`);
+        appendChatLine(msg, "self");
         net.sendChat(msg);
         chatInput.value = "";
       };
@@ -196,10 +273,10 @@ const config: Phaser.Types.Core.GameConfig = {
             renderInk(currentInkText);
           }
         } else if (code === EVENT_CODES.CHAT) {
-          appendChatLine(`${data.from || "Inconnu"}: ${data.text}`);
+          appendChatLine(`${data.from || "Inconnu"}: ${data.text}`, "other");
         } else if (code === EVENT_CODES.START) {
           begin();
-          appendChatLine(`La partie démarre (par ${data.by || "?"}) !`);
+          appendChatLine(`La partie démarre (par ${data.by || "?"}) !`, "system");
         }
       };
 
