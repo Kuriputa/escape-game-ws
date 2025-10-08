@@ -20,14 +20,24 @@ export class HospitalRoomScene extends Phaser.Scene {
     
     // Setup network event listener
     if (this.net) {
+      // Sauvegarder le gestionnaire d'événements original (défini dans main.ts)
+      const originalOnEvent = this.net.onEvent;
+      
       this.net.onEvent = (code: number, data: any) => {
         console.log("Scene received event:", code, data);
+        
+        // Gérer les événements spécifiques à cette scène
         if (code === EVENT_CODES.ITEM_PICKED) {
           console.log("ITEM_PICKED event received:", data);
           this.onItemPickedByOther(data);
         } else if (code === EVENT_CODES.PUZZLE_UPDATE && data.type === "box_unlock") {
           console.log("Box unlock event received");
           this.gameState.boxUnlocked = true;
+        }
+        
+        // Appeler le gestionnaire original pour les autres événements (CHAT, START, etc.)
+        if (originalOnEvent) {
+          originalOnEvent(code, data);
         }
       };
     }
@@ -300,7 +310,7 @@ export class HospitalRoomScene extends Phaser.Scene {
     });
 
     northDoor.on("pointerdown", () => {
-      this.changeRoom("CorridorScene");
+      this.changeRoom("CorridorSceneA");
     });
 
     // Porte Est (vers la salle informatique)
@@ -328,7 +338,7 @@ export class HospitalRoomScene extends Phaser.Scene {
       const hasBadge = this.gameState.hasItem("badge");
 
       if (hasBadge) {
-        this.changeRoom("ComputerRoomScene");
+        this.changeRoom("ComputerRoomSceneB");
       } else {
         // Afficher un message d'erreur
         const errorText = this.add.text(width / 2, height / 2, "Accès refusé !\nVous avez besoin d'un badge.", {

@@ -3,45 +3,115 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Escape Game - Prototype</title>
-    <script type="module" crossorigin src="/assets/index-DK0oaCMj.js"></script>
+    <title>🏥 Escape Game Coopératif - Hôpital</title>
+    <style>
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+      }
+      @keyframes glow {
+        0%, 100% { box-shadow: 0 0 5px #00d9ff, 0 0 10px #00d9ff; }
+        50% { box-shadow: 0 0 10px #00d9ff, 0 0 20px #00d9ff, 0 0 30px #00d9ff; }
+      }
+      .menu-container {
+        animation: fadeIn 0.6s ease-out;
+      }
+      .btn-primary {
+        transition: all 0.3s ease;
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(47, 140, 255, 0.4);
+      }
+      .btn-start {
+        transition: all 0.3s ease;
+        animation: pulse 2s infinite;
+      }
+      .btn-start:hover {
+        animation: none;
+        transform: scale(1.1);
+        box-shadow: 0 4px 16px rgba(39, 174, 96, 0.6);
+      }
+      input:focus {
+        outline: none;
+        border-color: #00d9ff !important;
+        box-shadow: 0 0 8px rgba(0, 217, 255, 0.3);
+      }
+      .title-glow {
+        animation: glow 3s infinite;
+        text-shadow: 0 0 10px #00d9ff, 0 0 20px #00d9ff;
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/index-D3tpkjET.js"></script>
   </head>
   <body>
     <!-- Photon Realtime browser SDK (global Photon) -->
     <script src="/vendor/photon/photon.min.js"></script>
     
     <!-- UI: Menu principal -->
-    <div id="menu" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:16px;background:#0b0b0bcc;color:#fff;font-family:Arial,Helvetica,sans-serif;z-index:2000;">
-      <div style="background:#1e1e1e;padding:20px 24px;border-radius:8px;min-width:320px;max-width:90vw;">
-        <h2 style="margin:0 0 12px 0;font-size:18px;">Rejoindre une salle</h2>
-        <label style="display:block;margin-bottom:8px;font-size:12px;opacity:.9;">Pseudo</label>
-        <input id="nickname" type="text" placeholder="Ex: Alex" style="width:100%;padding:8px;border-radius:4px;border:1px solid #333;background:#111;color:#fff;">
-        <label style="display:block;margin:12px 0 8px 0;font-size:12px;opacity:.9;">Nom de salle</label>
-        <input id="room" type="text" placeholder="Ex: ROOM-TEST" style="width:100%;padding:8px;border-radius:4px;border:1px solid #333;background:#111;color:#fff;">
-        <button id="joinBtn" style="margin-top:14px;width:100%;padding:10px;border:0;border-radius:4px;background:#2f8cff;color:#fff;font-weight:600;cursor:pointer;">Rejoindre</button>
-        <div id="menuError" style="margin-top:8px;color:#ff6666;font-size:12px;display:none;"></div>
+    <div id="menu" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:16px;background:linear-gradient(135deg, #0b0b0b 0%, #1a1a2e 100%);color:#fff;font-family:'Segoe UI',Arial,Helvetica,sans-serif;z-index:2000;">
+      <div class="menu-container" style="background:linear-gradient(145deg, #1e1e1e 0%, #2a2a2a 100%);padding:32px 40px;border-radius:16px;min-width:400px;max-width:90vw;border:2px solid #333;box-shadow:0 8px 32px rgba(0,0,0,0.6);">
+        <div style="text-align:center;margin-bottom:24px;">
+          <h1 class="title-glow" style="margin:0 0 8px 0;font-size:28px;font-weight:700;color:#00d9ff;">🏥 ESCAPE GAME</h1>
+          <p style="margin:0;font-size:14px;color:#aaa;font-weight:400;">Jeu coopératif à 2 joueurs</p>
+        </div>
+        <div style="background:#111;padding:16px;border-radius:8px;margin-bottom:20px;border-left:4px solid #00d9ff;">
+          <p style="margin:0;font-size:13px;line-height:1.5;color:#ccc;">
+            ⚠️ <strong>Important :</strong> Ce jeu nécessite <strong>2 joueurs</strong> qui doivent communiquer constamment via le chat pour résoudre les énigmes et s'échapper de l'hôpital.
+          </p>
+        </div>
+        <label style="display:block;margin-bottom:8px;font-size:13px;font-weight:600;color:#00d9ff;">👤 Votre pseudo</label>
+        <input id="nickname" type="text" placeholder="Ex: Alex" style="width:100%;padding:12px;border-radius:8px;border:2px solid #333;background:#0d0d0d;color:#fff;font-size:14px;transition:all 0.3s;">
+        <label style="display:block;margin:16px 0 8px 0;font-size:13px;font-weight:600;color:#00d9ff;">🚪 Code de salle</label>
+        <input id="room" type="text" placeholder="Ex: ROOM-TEST" style="width:100%;padding:12px;border-radius:8px;border:2px solid #333;background:#0d0d0d;color:#fff;font-size:14px;transition:all 0.3s;">
+        <button id="joinBtn" class="btn-primary" style="margin-top:20px;width:100%;padding:14px;border:0;border-radius:8px;background:linear-gradient(135deg, #2f8cff 0%, #1e5fa8 100%);color:#fff;font-weight:700;font-size:15px;cursor:pointer;letter-spacing:0.5px;">🔗 REJOINDRE LA PARTIE</button>
+        <div id="menuError" style="margin-top:12px;padding:10px;background:#ff000020;border:1px solid #ff0000;border-radius:6px;color:#ff6666;font-size:12px;display:none;"></div>
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid #333;text-align:center;">
+          <p style="margin:0;font-size:11px;color:#666;">💡 Astuce : Utilisez le même code de salle pour jouer ensemble</p>
+        </div>
       </div>
     </div>
 
     <!-- UI: Chat overlay -->
-    <div id="chat" style="position:absolute;right:12px;bottom:12px;width:300px;background:#1e1e1e;color:#fff;border:1px solid #333;border-radius:8px;display:none;z-index:2000;font-family:Arial,Helvetica,sans-serif;">
-      <div style="padding:8px 10px;border-bottom:1px solid #333;font-weight:700;">Chat</div>
-      <div id="chatLog" style="height:180px;overflow:auto;padding:8px 10px;font-size:12px;line-height:1.35;background:#111;"></div>
-      <div style="display:flex;gap:6px;padding:8px 10px;border-top:1px solid #333;">
-        <input id="chatInput" type="text" placeholder="Votre message..." style="flex:1;padding:8px;border-radius:4px;border:1px solid #333;background:#0b0b0b;color:#fff;">
-        <button id="chatSend" style="padding:8px 10px;border:0;border-radius:4px;background:#2f8cff;color:#fff;font-weight:600;cursor:pointer;">Envoyer</button>
+    <div id="chat" style="position:absolute;right:16px;bottom:16px;width:340px;background:linear-gradient(145deg, #1e1e1e 0%, #2a2a2a 100%);color:#fff;border:2px solid #333;border-radius:12px;display:none;z-index:2000;font-family:'Segoe UI',Arial,Helvetica,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,0.6);">
+      <div style="padding:12px 14px;border-bottom:2px solid #00d9ff;font-weight:700;font-size:14px;background:linear-gradient(135deg, #1a1a1a 0%, #252525 100%);border-radius:10px 10px 0 0;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:16px;">💬</span>
+        <span>Chat Coopératif</span>
+      </div>
+      <div id="chatLog" style="height:200px;overflow:auto;padding:10px 12px;font-size:13px;line-height:1.5;background:#0d0d0d;"></div>
+      <div style="display:flex;gap:8px;padding:10px 12px;border-top:1px solid #333;background:#1a1a1a;border-radius:0 0 10px 10px;">
+        <input id="chatInput" type="text" placeholder="Tapez votre message..." style="flex:1;padding:10px;border-radius:6px;border:2px solid #333;background:#0d0d0d;color:#fff;font-size:13px;transition:all 0.3s;">
+        <button id="chatSend" style="padding:10px 14px;border:0;border-radius:6px;background:linear-gradient(135deg, #2f8cff 0%, #1e5fa8 100%);color:#fff;font-weight:700;cursor:pointer;transition:all 0.3s;font-size:13px;">📤</button>
       </div>
     </div>
 
     <!-- UI: Lobby overlay -->
-    <div id="lobby" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:#0b0b0bcc;color:#fff;z-index:1999;font-family:Arial,Helvetica,sans-serif;">
-      <div style="background:#1e1e1e;padding:20px 24px;border-radius:8px;min-width:360px;max-width:90vw;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-          <h2 style="margin:0;font-size:18px;">Salle d'attente</h2>
-          <button id="startBtn" style="padding:8px 12px;border:0;border-radius:4px;background:#27ae60;color:#fff;font-weight:700;cursor:pointer;">Commencer</button>
+    <div id="lobby" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(135deg, rgba(11,11,11,0.95) 0%, rgba(26,26,46,0.95) 100%);color:#fff;z-index:1999;font-family:'Segoe UI',Arial,Helvetica,sans-serif;">
+      <div style="background:linear-gradient(145deg, #1e1e1e 0%, #2a2a2a 100%);padding:28px 32px;border-radius:16px;min-width:420px;max-width:90vw;border:2px solid #333;box-shadow:0 8px 32px rgba(0,0,0,0.6);">
+        <div style="text-align:center;margin-bottom:20px;">
+          <h2 style="margin:0 0 8px 0;font-size:24px;font-weight:700;color:#00d9ff;">⏳ Salle d'attente</h2>
+          <div id="lobbyRoom" style="font-size:13px;color:#aaa;font-weight:500;">Room: -</div>
         </div>
-        <div id="lobbyRoom" style="opacity:.8;font-size:12px;margin-bottom:10px;">Room: -</div>
-        <ul id="players" style="margin:0;padding-left:18px;max-height:220px;overflow:auto;font-size:13px;line-height:1.4;"></ul>
+        <div style="background:#111;padding:16px;border-radius:10px;margin-bottom:20px;border:2px solid #333;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+            <span style="font-size:18px;">👥</span>
+            <span style="font-weight:700;font-size:14px;color:#00d9ff;">Joueurs connectés</span>
+          </div>
+          <ul id="players" style="margin:0;padding:0;list-style:none;max-height:180px;overflow:auto;"></ul>
+        </div>
+        <div style="background:#0d2818;padding:14px;border-radius:8px;margin-bottom:20px;border-left:4px solid #27ae60;">
+          <p style="margin:0;font-size:12px;line-height:1.5;color:#ccc;">
+            ✅ <strong>Prêt à commencer ?</strong> Assurez-vous que les 2 joueurs sont présents, puis cliquez sur "Démarrer la partie".
+          </p>
+        </div>
+        <button id="startBtn" class="btn-start" style="width:100%;padding:16px;border:0;border-radius:10px;background:linear-gradient(135deg, #27ae60 0%, #1e8449 100%);color:#fff;font-weight:700;font-size:16px;cursor:pointer;letter-spacing:0.5px;box-shadow:0 4px 12px rgba(39,174,96,0.3);">🚀 DÉMARRER LA PARTIE</button>
+        <div style="margin-top:16px;text-align:center;">
+          <p style="margin:0;font-size:11px;color:#666;">⚠️ Une fois démarrée, la partie ne peut pas être mise en pause</p>
+        </div>
       </div>
     </div>
 
