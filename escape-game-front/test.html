@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Escape Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        .info {
+            max-width: 800px;
+            margin: 0 auto 20px;
+            padding: 20px;
+            background: #2a2a2a;
+            border-radius: 8px;
+        }
+        h1 {
+            color: #3498db;
+            margin-top: 0;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #27ae60;
+        }
+        .error {
+            background: #e74c3c;
+        }
+        .warning {
+            background: #f39c12;
+        }
+        #game-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .controls {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 15px;
+            background: #2a2a2a;
+            border-radius: 8px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .instructions {
+            margin-top: 10px;
+            padding: 10px;
+            background: #1a1a1a;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h1>🎮 Test du jeu Escape Game</h1>
+        <div id="status" class="status warning">
+            ⏳ Chargement de Phaser...
+        </div>
+        <div class="instructions">
+            <h3>Instructions :</h3>
+            <ul>
+                <li>📻 <strong>Cliquez sur le talkie-walkie</strong> pour écouter le message de mission</li>
+                <li>📦 <strong>Cliquez sur la boîte</strong> pour voir son contenu</li>
+                <li>🎯 <strong>Cliquez sur les objets</strong> dans la boîte pour les ajouter à votre inventaire</li>
+                <li>👜 <strong>Inventaire</strong> : 5 cases en bas de l'écran</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="game-container"></div>
+
+    <div class="controls">
+        <h3>🎛️ Contrôles de test</h3>
+        <button onclick="testWalkieTalkie()">Tester le talkie-walkie</button>
+        <button onclick="testBox()">Tester la boîte</button>
+        <button onclick="reloadGame()">Recharger le jeu</button>
+        <div style="margin-top: 10px; font-size: 12px; color: #888;">
+            Version : 1.0 | Phaser 3.88.2
+        </div>
+    </div>
+
+    <script src="./phaser.js"></script>
+    <script type="module">
+        import { GameScene } from './src/scenes/GameScene.js';
+
+        // Vérifier que Phaser est chargé
+        if (typeof Phaser !== 'undefined') {
+            document.getElementById('status').className = 'status success';
+            document.getElementById('status').textContent = '✅ Phaser chargé avec succès !';
+        } else {
+            document.getElementById('status').className = 'status error';
+            document.getElementById('status').textContent = '❌ Erreur : Phaser n\'a pas pu être chargé';
+        }
+
+        const config = {
+            type: Phaser.AUTO,
+            title: 'Escape Game - Test',
+            parent: 'game-container',
+            width: 1280,
+            height: 720,
+            backgroundColor: '#000000',
+            pixelArt: false,
+            scene: [GameScene],
+            scale: {
+                mode: Phaser.Scale.FIT,
+                autoCenter: Phaser.Scale.CENTER_BOTH
+            },
+        };
+
+        window.game = new Phaser.Game(config);
+
+        // Fonctions de test
+        window.testWalkieTalkie = function() {
+            console.log('Test du talkie-walkie');
+            alert('Cliquez sur le talkie-walkie dans le jeu (en bas à gauche) pour voir le dialogue !');
+        };
+
+        window.testBox = function() {
+            console.log('Test de la boîte');
+            alert('Cliquez sur la boîte dans le jeu (en bas à droite) pour voir son contenu !');
+        };
+
+        window.reloadGame = function() {
+            location.reload();
+        };
+
+        // Log de démarrage
+        console.log('%c🎮 Escape Game - Test Mode', 'color: #3498db; font-size: 20px; font-weight: bold;');
+        console.log('%cLe jeu est chargé et prêt !', 'color: #27ae60; font-size: 14px;');
+        console.log('Scène active:', window.game.scene.scenes[0].scene.key);
+    </script>
+</body>
+</html>

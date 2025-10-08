@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Escape Game - Prototype</title>
+    <script type="module" crossorigin src="/assets/index-DK0oaCMj.js"></script>
+  </head>
+  <body>
+    <!-- Photon Realtime browser SDK (global Photon) -->
+    <script src="/vendor/photon/photon.min.js"></script>
+    
+    <!-- UI: Menu principal -->
+    <div id="menu" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:16px;background:#0b0b0bcc;color:#fff;font-family:Arial,Helvetica,sans-serif;z-index:2000;">
+      <div style="background:#1e1e1e;padding:20px 24px;border-radius:8px;min-width:320px;max-width:90vw;">
+        <h2 style="margin:0 0 12px 0;font-size:18px;">Rejoindre une salle</h2>
+        <label style="display:block;margin-bottom:8px;font-size:12px;opacity:.9;">Pseudo</label>
+        <input id="nickname" type="text" placeholder="Ex: Alex" style="width:100%;padding:8px;border-radius:4px;border:1px solid #333;background:#111;color:#fff;">
+        <label style="display:block;margin:12px 0 8px 0;font-size:12px;opacity:.9;">Nom de salle</label>
+        <input id="room" type="text" placeholder="Ex: ROOM-TEST" style="width:100%;padding:8px;border-radius:4px;border:1px solid #333;background:#111;color:#fff;">
+        <button id="joinBtn" style="margin-top:14px;width:100%;padding:10px;border:0;border-radius:4px;background:#2f8cff;color:#fff;font-weight:600;cursor:pointer;">Rejoindre</button>
+        <div id="menuError" style="margin-top:8px;color:#ff6666;font-size:12px;display:none;"></div>
+      </div>
+    </div>
+
+    <!-- UI: Chat overlay -->
+    <div id="chat" style="position:absolute;right:12px;bottom:12px;width:300px;background:#1e1e1e;color:#fff;border:1px solid #333;border-radius:8px;display:none;z-index:2000;font-family:Arial,Helvetica,sans-serif;">
+      <div style="padding:8px 10px;border-bottom:1px solid #333;font-weight:700;">Chat</div>
+      <div id="chatLog" style="height:180px;overflow:auto;padding:8px 10px;font-size:12px;line-height:1.35;background:#111;"></div>
+      <div style="display:flex;gap:6px;padding:8px 10px;border-top:1px solid #333;">
+        <input id="chatInput" type="text" placeholder="Votre message..." style="flex:1;padding:8px;border-radius:4px;border:1px solid #333;background:#0b0b0b;color:#fff;">
+        <button id="chatSend" style="padding:8px 10px;border:0;border-radius:4px;background:#2f8cff;color:#fff;font-weight:600;cursor:pointer;">Envoyer</button>
+      </div>
+    </div>
+
+    <!-- UI: Lobby overlay -->
+    <div id="lobby" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:#0b0b0bcc;color:#fff;z-index:1999;font-family:Arial,Helvetica,sans-serif;">
+      <div style="background:#1e1e1e;padding:20px 24px;border-radius:8px;min-width:360px;max-width:90vw;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <h2 style="margin:0;font-size:18px;">Salle d'attente</h2>
+          <button id="startBtn" style="padding:8px 12px;border:0;border-radius:4px;background:#27ae60;color:#fff;font-weight:700;cursor:pointer;">Commencer</button>
+        </div>
+        <div id="lobbyRoom" style="opacity:.8;font-size:12px;margin-bottom:10px;">Room: -</div>
+        <ul id="players" style="margin:0;padding-left:18px;max-height:220px;overflow:auto;font-size:13px;line-height:1.4;"></ul>
+      </div>
+    </div>
+
+    <!-- UI: Dialogue overlay (Ink) -->
+    <div id="dialog" style="position:absolute;inset:0;display:none;align-items:flex-end;justify-content:center;pointer-events:none;z-index:1500;">
+      <div style="width:min(920px,90vw);margin:0 0 24px 0;background:#111c;border:1px solid #444;border-radius:10px;padding:14px 16px;color:#fff;font-family:Arial,Helvetica,sans-serif;pointer-events:auto;">
+        <div id="dialogText" style="min-height:60px;white-space:pre-wrap;line-height:1.4;font-size:14px;"></div>
+        <div style="display:flex;justify-content:flex-end;margin-top:10px;gap:8px;">
+          <button id="dialogClose" style="padding:8px 12px;border:0;border-radius:6px;background:#2f8cff;color:#fff;font-weight:700;cursor:pointer;">Fermer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- UI: Inventory bar -->
+    <div id="inventoryBar" style="position:absolute;left:50%;transform:translateX(-50%);bottom:10px;display:none;gap:8px;z-index:1400;">
+      <div class="slot" style="width:56px;height:56px;border:2px solid #444;border-radius:8px;background:#111c;"></div>
+      <div class="slot" style="width:56px;height:56px;border:2px solid #444;border-radius:8px;background:#111c;"></div>
+      <div class="slot" style="width:56px;height:56px;border:2px solid #444;border-radius:8px;background:#111c;"></div>
+      <div class="slot" style="width:56px;height:56px;border:2px solid #444;border-radius:8px;background:#111c;"></div>
+    </div>
+
+  </body>
+</html>
