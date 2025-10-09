@@ -92,7 +92,7 @@ export class CorridorSceneA extends Phaser.Scene {
     rightWall.setStrokeStyle(2, 0x888888);
 
     // Titre
-    this.add.text(width / 2, 50, "Couloir - Parcours A", {
+    this.add.text(width / 2, 50, "Couloir", {
       fontSize: "28px",
       color: "#333333",
       fontStyle: "bold",
@@ -235,7 +235,7 @@ export class CorridorSceneA extends Phaser.Scene {
     const message = this.add.text(
       this.scale.width / 2,
       this.scale.height - 100,
-      "🎯 Objectif : Ouvrir la porte menant à la salle du patient\n💡 Le Joueur B doit rétablir le courant depuis la salle informatique",
+      "Objectif : Ouvrir la porte menant à la salle du patient\nLe Joueur B doit rétablir le courant depuis la salle informatique",
       {
         fontSize: "16px",
         color: "#ffffff",

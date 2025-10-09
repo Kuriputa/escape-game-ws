@@ -86,7 +86,7 @@ export class MedicineStorageScene extends Phaser.Scene {
     floor.setStrokeStyle(4, 0xcccccc);
 
     // Titre
-    this.add.text(width / 2, 50, "Stockage Médicaments - Parcours B", {
+    this.add.text(width / 2, 50, "Stockage Médicaments", {
       fontSize: "28px",
       color: "#2c3e50",
       fontStyle: "bold",

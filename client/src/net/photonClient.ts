@@ -98,6 +98,19 @@ export class Net {
     this.send(EVENT_CODES.START, { by: this.nickname, t: Date.now() });
   }
 
+  getPlayerRole(): string {
+    try {
+      const myActor = this.client.myActor?.();
+      if (!myActor) return "A";
+      
+      const actorNr = myActor.actorNr || myActor.getActorNr?.() || 1;
+      // Premier joueur (actorNr = 1) = Joueur A, deuxième (actorNr = 2) = Joueur B
+      return actorNr === 1 ? "A" : "B";
+    } catch {
+      return "A";
+    }
+  }
+
   private notifyPlayers() {
     try {
       const actorsMap = this.client.myRoomActors ? this.client.myRoomActors() : this.client.actors;

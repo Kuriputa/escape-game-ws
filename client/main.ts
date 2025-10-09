@@ -5,6 +5,7 @@ import Phaser from "phaser";
 import { Net, EVENT_CODES } from "./src/net/photonClient";
 import { Story } from "inkjs";
 import storyJSON from "./src/ink/story.json"; // JSON exporté depuis Inky/Inklecate
+import { GameState } from "./src/GameState";
 import { HospitalRoomScene } from "./src/scenes/HospitalRoomScene";
 import { CorridorScene } from "./src/scenes/CorridorScene";
 import { ComputerRoomScene } from "./src/scenes/ComputerRoomScene";
@@ -155,6 +156,11 @@ const config: Phaser.Types.Core.GameConfig = {
         // Garder le chat visible pendant la partie
         chatBox.style.display = "block";
         appendChatLine("Départ de la partie !");
+        
+        // Déterminer et stocker le rôle du joueur
+        const gameState = GameState.getInstance();
+        gameState.playerRole = net.getPlayerRole();
+        console.log("Rôle du joueur:", gameState.playerRole);
         
         // Ajouter toutes les scènes
         this.scene.add("HospitalRoomScene", HospitalRoomScene, false);

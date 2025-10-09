@@ -63,53 +63,59 @@ export class ExitRoomScene extends Phaser.Scene {
   }
 
   private createRoom() {
+    const width = this.scale.width;
+    const height = this.scale.height;
+
     // Sol
-    const floor = this.add.rectangle(400, 500, 800, 200, 0x2c2c2c);
+    const floor = this.add.rectangle(width / 2, height * 0.83, width, height * 0.33, 0x2c2c2c);
     floor.setStrokeStyle(2, 0x1a1a1a);
 
     // Murs
-    const wallLeft = this.add.rectangle(50, 300, 100, 600, 0x1a1a1a);
+    const wallLeft = this.add.rectangle(width * 0.06, height / 2, width * 0.12, height, 0x1a1a1a);
     wallLeft.setStrokeStyle(2, 0x0f0f0f);
 
-    const wallRight = this.add.rectangle(750, 300, 100, 600, 0x1a1a1a);
+    const wallRight = this.add.rectangle(width * 0.94, height / 2, width * 0.12, height, 0x1a1a1a);
     wallRight.setStrokeStyle(2, 0x0f0f0f);
 
     // Plafond
-    const ceiling = this.add.rectangle(400, 50, 800, 100, 0x0f0f0f);
+    const ceiling = this.add.rectangle(width / 2, height * 0.08, width, height * 0.17, 0x0f0f0f);
     ceiling.setStrokeStyle(2, 0x1a1a1a);
 
     // Titre de la salle
-    this.add.text(400, 30, "SALLE DE SORTIE", {
+    this.add.text(width / 2, height * 0.05, "SALLE DE SORTIE", {
       fontSize: "28px",
       color: "#ff6b6b",
       fontStyle: "bold"
     }).setOrigin(0.5);
 
     // Ambiance sombre
-    const shadow = this.add.rectangle(400, 300, 800, 600, 0x000000, 0.3);
+    const shadow = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.3);
   }
 
   private createExitDoor() {
+    const width = this.scale.width;
+    const height = this.scale.height;
+
     // Grande porte de sortie (verrouillée pour l'instant)
-    const door = this.add.rectangle(400, 120, 150, 140, 0x654321);
+    const door = this.add.rectangle(width / 2, height * 0.2, width * 0.19, height * 0.23, 0x654321);
     door.setStrokeStyle(4, 0x8b4513);
 
     // Poignées
-    this.add.circle(370, 120, 10, 0xffd700);
-    this.add.circle(430, 120, 10, 0xffd700);
+    this.add.circle(width / 2 - width * 0.0375, height * 0.2, width * 0.0125, 0xffd700);
+    this.add.circle(width / 2 + width * 0.0375, height * 0.2, width * 0.0125, 0xffd700);
 
     // Panneau "SORTIE"
-    const exitSign = this.add.rectangle(400, 50, 120, 30, 0xff0000);
+    const exitSign = this.add.rectangle(width / 2, height * 0.08, width * 0.15, height * 0.05, 0xff0000);
     exitSign.setStrokeStyle(2, 0xffffff);
 
-    this.add.text(400, 50, "SORTIE", {
+    this.add.text(width / 2, height * 0.08, "SORTIE", {
       fontSize: "20px",
       color: "#ffffff",
       fontStyle: "bold"
     }).setOrigin(0.5);
 
     // Lumière clignotante
-    const light = this.add.circle(400, 80, 8, 0xff0000);
+    const light = this.add.circle(width / 2, height * 0.13, width * 0.01, 0xff0000);
     this.tweens.add({
       targets: light,
       alpha: 0.2,
@@ -120,24 +126,27 @@ export class ExitRoomScene extends Phaser.Scene {
   }
 
   private createMedicineCrate() {
-    // Caisse de médicaments au centre
-    const crate = this.add.rectangle(400, 250, 120, 100, 0x8b4513);
+    const width = this.scale.width;
+    const height = this.scale.height;
+
+    // Caisse de médicaments au centre - mieux positionnée
+    const crate = this.add.rectangle(width / 2, height * 0.38, width * 0.16, height * 0.18, 0x8b4513);
     crate.setStrokeStyle(3, 0x654321);
 
-    // Croix rouge
-    this.add.rectangle(400, 250, 60, 15, 0xff0000);
-    this.add.rectangle(400, 250, 15, 60, 0xff0000);
+    // Croix rouge - plus grande
+    this.add.rectangle(width / 2, height * 0.38, width * 0.08, height * 0.03, 0xff0000);
+    this.add.rectangle(width / 2, height * 0.38, width * 0.0225, height * 0.11, 0xff0000);
 
-    // Label
-    this.add.text(400, 300, "MÉDICAMENTS", {
-      fontSize: "14px",
+    // Label - mieux espacé
+    this.add.text(width / 2, height * 0.48, "MÉDICAMENTS", {
+      fontSize: "15px",
       color: "#ffffff",
       backgroundColor: "#000000",
-      padding: { x: 5, y: 3 }
+      padding: { x: 8, y: 5 }
     }).setOrigin(0.5);
 
     // Effet de brillance
-    const glow = this.add.circle(400, 250, 70, 0xffff00, 0.1);
+    const glow = this.add.circle(width / 2, height * 0.38, width * 0.094, 0xffff00, 0.1);
     this.tweens.add({
       targets: glow,
       scale: 1.2,
@@ -149,15 +158,18 @@ export class ExitRoomScene extends Phaser.Scene {
   }
 
   private createRadio() {
-    // Radio avec message
-    const radio = this.add.rectangle(150, 200, 100, 60, 0x2c2c2c);
+    const width = this.scale.width;
+    const height = this.scale.height;
+
+    // Radio avec message - repositionnée
+    const radio = this.add.rectangle(width * 0.19, height * 0.32, width * 0.125, height * 0.1, 0x2c2c2c);
     radio.setStrokeStyle(2, 0x00ff00);
 
     // Antenne
-    this.add.line(0, 0, 150, 170, 150, 140, 0x00ff00, 1).setLineWidth(2);
+    this.add.line(0, 0, width * 0.19, height * 0.27, width * 0.19, height * 0.22, 0x00ff00, 1).setLineWidth(2);
 
     // LED clignotante
-    const led = this.add.circle(130, 190, 5, 0x00ff00);
+    const led = this.add.circle(width * 0.165, height * 0.3, width * 0.006, 0x00ff00);
     this.tweens.add({
       targets: led,
       alpha: 0.3,
@@ -166,41 +178,44 @@ export class ExitRoomScene extends Phaser.Scene {
       repeat: -1
     });
 
-    this.add.text(150, 200, "📻", {
+    this.add.text(width * 0.19, height * 0.32, "📻", {
       fontSize: "30px"
     }).setOrigin(0.5);
 
-    // Message radio
-    const radioMessage = this.add.text(400, 360, 
-      "📻 TRANSMISSION RADIO 📻\n\n" +
+    // Message radio - mieux espacé
+    const radioMessage = this.add.text(width / 2, height * 0.6, 
+      "TRANSMISSION RADIO\n\n" +
       "\"Mission accomplie. Prenez les médicaments et sortez.\n" +
       "Ou… rendez-les. Faites le bon choix.\"\n\n" +
-      "⚠️ Votre décision aura des conséquences.",
+      "Votre décision aura des conséquences.",
       {
-        fontSize: "16px",
+        fontSize: "17px",
         color: "#ffff00",
         backgroundColor: "#000000",
-        padding: { x: 20, y: 15 },
+        padding: { x: 25, y: 18 },
         align: "center",
-        wordWrap: { width: 600 }
+        wordWrap: { width: width * 0.81 }
       }
     ).setOrigin(0.5);
   }
 
   private createChoiceButtons() {
-    // Bouton "Voler les médicaments"
-    const stealBtn = this.add.rectangle(250, 480, 200, 60, 0xff0000);
-    stealBtn.setStrokeStyle(3, 0xff6b6b);
+    const width = this.scale.width;
+    const height = this.scale.height;
+
+    // Bouton "Voler les médicaments" - plus grand et mieux espacé
+    const stealBtn = this.add.rectangle(width * 0.3, height * 0.78, width * 0.275, height * 0.12, 0xff0000);
+    stealBtn.setStrokeStyle(4, 0xff6b6b);
     stealBtn.setInteractive({ useHandCursor: true });
 
-    this.add.text(250, 470, "💊 VOLER", {
-      fontSize: "20px",
+    this.add.text(width * 0.3, height * 0.76, "VOLER", {
+      fontSize: "22px",
       color: "#ffffff",
       fontStyle: "bold"
     }).setOrigin(0.5);
 
-    this.add.text(250, 490, "les médicaments", {
-      fontSize: "12px",
+    this.add.text(width * 0.3, height * 0.8, "les médicaments", {
+      fontSize: "13px",
       color: "#ffffff"
     }).setOrigin(0.5);
 
@@ -218,19 +233,19 @@ export class ExitRoomScene extends Phaser.Scene {
       stealBtn.setFillStyle(0xff0000);
     });
 
-    // Bouton "Restituer les médicaments"
-    const returnBtn = this.add.rectangle(550, 480, 200, 60, 0x00ff00);
-    returnBtn.setStrokeStyle(3, 0x6bff6b);
+    // Bouton "Restituer les médicaments" - plus grand et mieux espacé
+    const returnBtn = this.add.rectangle(width * 0.7, height * 0.78, width * 0.275, height * 0.12, 0x00ff00);
+    returnBtn.setStrokeStyle(4, 0x6bff6b);
     returnBtn.setInteractive({ useHandCursor: true });
 
-    this.add.text(550, 470, "✋ RESTITUER", {
-      fontSize: "20px",
+    this.add.text(width * 0.7, height * 0.76, "RESTITUER", {
+      fontSize: "22px",
       color: "#000000",
       fontStyle: "bold"
     }).setOrigin(0.5);
 
-    this.add.text(550, 490, "les médicaments", {
-      fontSize: "12px",
+    this.add.text(width * 0.7, height * 0.8, "les médicaments", {
+      fontSize: "13px",
       color: "#000000"
     }).setOrigin(0.5);
 
@@ -250,14 +265,18 @@ export class ExitRoomScene extends Phaser.Scene {
   }
 
   private createTimer() {
-    // Timer de 30 secondes
-    this.add.text(400, 540, "⏱️ TEMPS RESTANT :", {
-      fontSize: "16px",
-      color: "#ffffff"
+    const width = this.scale.width;
+    const height = this.scale.height;
+
+    // Timer de 30 secondes - mieux espacé
+    this.add.text(width / 2, height * 0.92, "TEMPS RESTANT :", {
+      fontSize: "18px",
+      color: "#ffffff",
+      fontStyle: "bold"
     }).setOrigin(0.5);
 
-    this.timerText = this.add.text(400, 565, "30", {
-      fontSize: "32px",
+    this.timerText = this.add.text(width / 2, height * 0.97, "30", {
+      fontSize: "36px",
       color: "#ffff00",
       fontStyle: "bold"
     }).setOrigin(0.5);
@@ -300,8 +319,11 @@ export class ExitRoomScene extends Phaser.Scene {
       player: this.playerRole
     });
 
+    const width = this.scale.width;
+    const height = this.scale.height;
+
     // Message de confirmation
-    const confirmMsg = this.add.text(400, 430, 
+    const confirmMsg = this.add.text(width / 2, height * 0.72, 
       choice === "steal" 
         ? "Vous avez choisi de VOLER les médicaments."
         : "Vous avez choisi de RESTITUER les médicaments.",
@@ -340,8 +362,11 @@ export class ExitRoomScene extends Phaser.Scene {
 
     this.gameEnded = true;
 
-    const timeoutMsg = this.add.text(400, 300, 
-      "⏱️ TEMPS ÉCOULÉ !\n\nVous n'avez pas pris de décision à temps.\nL'alarme se déclenche...",
+    const width = this.scale.width;
+    const height = this.scale.height;
+
+    const timeoutMsg = this.add.text(width / 2, height / 2, 
+      "TEMPS ÉCOULÉ !\n\nVous n'avez pas pris de décision à temps.\nL'alarme se déclenche...",
       {
         fontSize: "20px",
         color: "#ff0000",
@@ -355,8 +380,11 @@ export class ExitRoomScene extends Phaser.Scene {
   }
 
   private showEpilogue(outcome: string) {
+    const width = this.scale.width;
+    const height = this.scale.height;
+
     // Overlay noir
-    const overlay = this.add.rectangle(400, 300, 800, 600, 0x000000, 0.9);
+    const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.9);
     overlay.setDepth(4000);
 
     let epilogueText = "";
@@ -365,69 +393,69 @@ export class ExitRoomScene extends Phaser.Scene {
     switch (outcome) {
       case "steal_both":
         epilogueText = 
-          "🌙 ÉPILOGUE : LA FUITE 🌙\n\n" +
+          "ÉPILOGUE : LA FUITE\n\n" +
           "Vous fuyez tous les deux dans la nuit.\n" +
           "L'alarme retentit derrière vous.\n\n" +
           "Les médicaments sont en votre possession,\n" +
           "mais votre conscience est lourde.\n\n" +
           "Avez-vous fait le bon choix ?\n\n" +
-          "💔 FIN - Conscience troublée";
+          "FIN - Conscience troublée";
         epilogueColor = "#ff6b6b";
         break;
 
       case "return_both":
         epilogueText = 
-          "🌟 ÉPILOGUE : LA CONSCIENCE CLAIRE 🌟\n\n" +
+          "ÉPILOGUE : LA CONSCIENCE CLAIRE\n\n" +
           "Vous restituez les médicaments ensemble.\n" +
           "La mission est avortée, mais vous partez la tête haute.\n\n" +
           "Ces médicaments sauveront des vies.\n" +
           "L'humanité avant tout.\n\n" +
           "Vous avez fait le bon choix.\n\n" +
-          "💚 FIN - Conscience claire";
+          "FIN - Conscience claire";
         epilogueColor = "#00ff00";
         break;
 
       case "divergence":
         epilogueText = 
-          "⚠️ ÉPILOGUE : LA DIVERGENCE ⚠️\n\n" +
+          "ÉPILOGUE : LA DIVERGENCE\n\n" +
           "Vos choix divergent !\n" +
           "L'un veut voler, l'autre restituer.\n\n" +
           "L'alarme se déclenche immédiatement.\n" +
           "Vous fuyez précipitamment, séparés.\n\n" +
           "La confiance est brisée.\n\n" +
-          "💔 FIN - Trahison mutuelle";
+          "FIN - Trahison mutuelle";
         epilogueColor = "#ffaa00";
         break;
 
       case "timeout":
         epilogueText = 
-          "⏱️ ÉPILOGUE : L'INDÉCISION ⏱️\n\n" +
+          "ÉPILOGUE : L'INDÉCISION\n\n" +
           "Vous n'avez pas su prendre de décision.\n" +
           "L'alarme se déclenche automatiquement.\n\n" +
           "Les gardes arrivent.\n" +
           "Vous êtes capturés.\n\n" +
           "L'indécision a un prix.\n\n" +
-          "❌ FIN - Échec";
+          "FIN - Échec";
         epilogueColor = "#ff0000";
         break;
     }
 
-    const epilogue = this.add.text(400, 300, epilogueText, {
+    const epilogue = this.add.text(width / 2, height / 2, epilogueText, {
       fontSize: "18px",
       color: epilogueColor,
       backgroundColor: "#000000",
       padding: { x: 30, y: 20 },
       align: "center",
-      wordWrap: { width: 600 }
+      wordWrap: { width: width * 0.75 }
     }).setOrigin(0.5).setDepth(5000);
 
     // Bouton pour recommencer
-    const restartBtn = this.add.rectangle(400, 520, 200, 50, 0x4ecdc4);
+    const restartBtn = this.add.rectangle(width / 2, height * 0.87, width * 0.25, height * 0.08, 0x4ecdc4);
     restartBtn.setStrokeStyle(3, 0x00d9ff);
     restartBtn.setInteractive({ useHandCursor: true });
     restartBtn.setDepth(5000);
 
-    const restartText = this.add.text(400, 520, "🔄 RECOMMENCER", {
+    const restartText = this.add.text(width / 2, height * 0.87, "🔄 RECOMMENCER", {
       fontSize: "18px",
       color: "#ffffff",
       fontStyle: "bold"
