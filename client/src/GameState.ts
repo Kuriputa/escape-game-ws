@@ -12,6 +12,9 @@ export interface InventoryItem {
 export class GameState {
   private static instance: GameState;
   
+  // Rôle du joueur (A ou B)
+  public playerRole: string = "A";
+  
   // État de l'inventaire du joueur
   public playerInventory: InventoryItem[] = [];
   
@@ -65,6 +68,7 @@ export class GameState {
 
   // Réinitialiser l'état (pour recommencer le jeu)
   public reset() {
+    this.playerRole = "A";
     this.playerInventory = [];
     this.boxItems.clear();
     this.boxItems.set("carte", true);

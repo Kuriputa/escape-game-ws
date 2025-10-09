@@ -91,7 +91,7 @@ export class PatientRoomScene extends Phaser.Scene {
     floor.setStrokeStyle(4, 0xb0c4de);
 
     // Titre
-    this.add.text(width / 2, 50, "Salle du Patient - Parcours A", {
+    this.add.text(width / 2, 50, "Salle du Patient", {
       fontSize: "28px",
       color: "#2c3e50",
       fontStyle: "bold",
@@ -435,10 +435,10 @@ export class PatientRoomScene extends Phaser.Scene {
       }
     ).setOrigin(0.5).setDepth(2501);
 
-    // Boutons de choix
-    const correctBtn = this.createDoseButton("6.5 mL", this.scale.height / 2 + 20, "#27ae60");
-    const wrongBtn1 = this.createDoseButton("7.0 mL", this.scale.height / 2 + 70, "#c0392b");
-    const wrongBtn2 = this.createDoseButton("5.5 mL", this.scale.height / 2 + 120, "#c0392b");
+    // Boutons de choix (ordre mélangé, couleur neutre)
+    const wrongBtn1 = this.createDoseButton("7.0 mL", this.scale.height / 2 + 20, "#34495e");
+    const correctBtn = this.createDoseButton("6.5 mL", this.scale.height / 2 + 70, "#34495e");
+    const wrongBtn2 = this.createDoseButton("5.5 mL", this.scale.height / 2 + 120, "#34495e");
     const closeBtn = this.createDoseButton("Annuler", this.scale.height / 2 + 170, "#555555");
 
     correctBtn.on("pointerdown", () => {

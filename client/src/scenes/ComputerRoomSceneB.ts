@@ -9,6 +9,7 @@ export class ComputerRoomSceneB extends Phaser.Scene {
   private gameState!: GameState;
   private terminalUnlocked: boolean = false;
   private powerRestored: boolean = false;
+  private powerCfgRead: boolean = false;
   private terminalText: Phaser.GameObjects.Text | null = null;
   private commandHistory: string[] = [];
 
@@ -84,7 +85,7 @@ export class ComputerRoomSceneB extends Phaser.Scene {
     floor.setStrokeStyle(4, 0x1a252f);
 
     // Titre
-    this.add.text(width / 2, 50, "Salle Informatique - Parcours B", {
+    this.add.text(width / 2, 50, "Salle Informatique", {
       fontSize: "28px",
       color: "#ecf0f1",
       fontStyle: "bold",
@@ -263,7 +264,7 @@ export class ComputerRoomSceneB extends Phaser.Scene {
     const message = this.add.text(
       this.scale.width / 2,
       this.scale.height - 80,
-      "🎯 Objectif : Rétablir le courant pour aider le Joueur A\n💡 Utilisez le terminal Linux pour activer le générateur",
+      "Objectif : Rétablir le courant pour aider le Joueur A\nUtilisez le terminal Linux pour activer le générateur",
       {
         fontSize: "16px",
         color: "#ffffff",
@@ -287,7 +288,7 @@ export class ComputerRoomSceneB extends Phaser.Scene {
     const message = this.add.text(
       this.scale.width / 2,
       this.scale.height / 2 - 200,
-      "📝 POST-IT TROUVÉ\n\n⚠️ MAUVAISE PRATIQUE DÉTECTÉE !\n\nNe jamais noter de mots de passe\nsur des post-it visibles !\n\nLogin: root\nPassword: root1234",
+      "POST-IT TROUVÉ\n\nMAUVAISE PRATIQUE DÉTECTÉE !\n\nNe jamais noter de mots de passe\nsur des post-it visibles !\n\nLogin: root\nPassword: root1234",
       {
         fontSize: "18px",
         color: "#ffff00",
@@ -339,34 +340,46 @@ export class ComputerRoomSceneB extends Phaser.Scene {
       }
     ).setOrigin(0.5).setDepth(2501);
 
-    // Boutons de choix
-    const correctBtn = this.add.text(
-      this.scale.width / 2,
-      this.scale.height / 2 + 20,
-      "root1234",
-      {
-        fontSize: "18px",
-        color: "#ffffff",
-        backgroundColor: "#27ae60",
-        padding: { x: 20, y: 10 },
-      }
-    ).setOrigin(0.5).setDepth(2501).setInteractive({ useHandCursor: true });
-
+    // Boutons de choix (ordre mélangé, couleur neutre)
     const wrongBtn1 = this.add.text(
       this.scale.width / 2,
-      this.scale.height / 2 + 70,
+      this.scale.height / 2 + 20,
       "admin123",
       {
         fontSize: "18px",
         color: "#ffffff",
-        backgroundColor: "#c0392b",
+        backgroundColor: "#34495e",
+        padding: { x: 20, y: 10 },
+      }
+    ).setOrigin(0.5).setDepth(2501).setInteractive({ useHandCursor: true });
+
+    const correctBtn = this.add.text(
+      this.scale.width / 2,
+      this.scale.height / 2 + 70,
+      "root1234",
+      {
+        fontSize: "18px",
+        color: "#ffffff",
+        backgroundColor: "#34495e",
+        padding: { x: 20, y: 10 },
+      }
+    ).setOrigin(0.5).setDepth(2501).setInteractive({ useHandCursor: true });
+
+    const wrongBtn2 = this.add.text(
+      this.scale.width / 2,
+      this.scale.height / 2 + 120,
+      "hospital2024",
+      {
+        fontSize: "18px",
+        color: "#ffffff",
+        backgroundColor: "#34495e",
         padding: { x: 20, y: 10 },
       }
     ).setOrigin(0.5).setDepth(2501).setInteractive({ useHandCursor: true });
 
     const closeBtn = this.add.text(
       this.scale.width / 2,
-      this.scale.height / 2 + 120,
+      this.scale.height / 2 + 170,
       "Annuler",
       {
         fontSize: "16px",
@@ -378,15 +391,19 @@ export class ComputerRoomSceneB extends Phaser.Scene {
 
     correctBtn.on("pointerdown", () => {
       this.unlockTerminal();
-      [dialogBg, title, instruction, correctBtn, wrongBtn1, closeBtn].forEach(obj => obj.destroy());
+      [dialogBg, title, instruction, correctBtn, wrongBtn1, wrongBtn2, closeBtn].forEach(obj => obj.destroy());
     });
 
     wrongBtn1.on("pointerdown", () => {
       this.showWrongPasswordMessage();
     });
 
+    wrongBtn2.on("pointerdown", () => {
+      this.showWrongPasswordMessage();
+    });
+
     closeBtn.on("pointerdown", () => {
-      [dialogBg, title, instruction, correctBtn, wrongBtn1, closeBtn].forEach(obj => obj.destroy());
+      [dialogBg, title, instruction, correctBtn, wrongBtn1, wrongBtn2, closeBtn].forEach(obj => obj.destroy());
     });
   }
 
@@ -451,14 +468,14 @@ export class ComputerRoomSceneB extends Phaser.Scene {
       this.scale.width / 2,
       this.scale.height / 2,
       600,
-      400,
+      500,
       0x000000,
       0.95
     ).setDepth(2500).setStrokeStyle(4, 0x00ff00);
 
     const title = this.add.text(
       this.scale.width / 2,
-      this.scale.height / 2 - 160,
+      this.scale.height / 2 - 210,
       "💻 COMMANDES DISPONIBLES",
       {
         fontSize: "22px",
@@ -467,33 +484,59 @@ export class ComputerRoomSceneB extends Phaser.Scene {
       }
     ).setOrigin(0.5).setDepth(2501);
 
-    // Boutons de commandes
-    const lsBtn = this.createCommandButton("ls", this.scale.height / 2 - 100);
-    const catBtn = this.createCommandButton("cat power.cfg", this.scale.height / 2 - 50);
-    const sudoBtn = this.createCommandButton("sudo systemctl start power-grid", this.scale.height / 2);
-    const closeBtn = this.createCommandButton("Fermer", this.scale.height / 2 + 100, "#555555");
+    const hint = this.add.text(
+      this.scale.width / 2,
+      this.scale.height / 2 - 170,
+      "Explorez le système pour trouver comment rétablir le courant",
+      {
+        fontSize: "14px",
+        color: "#888888",
+        fontStyle: "italic",
+      }
+    ).setOrigin(0.5).setDepth(2501);
+
+    // Boutons de commandes (couleur neutre, ordre mélangé)
+    const pwdBtn = this.createCommandButton("pwd", this.scale.height / 2 - 120, "#34495e");
+    const lsBtn = this.createCommandButton("ls", this.scale.height / 2 - 70, "#34495e");
+    const catNetworkBtn = this.createCommandButton("cat network.conf", this.scale.height / 2 - 20, "#34495e");
+    const catBtn = this.createCommandButton("cat power.cfg", this.scale.height / 2 + 30, "#34495e");
+    const sudoBtn = this.createCommandButton("sudo systemctl start power-grid", this.scale.height / 2 + 80, "#34495e");
+    const closeBtn = this.createCommandButton("Fermer", this.scale.height / 2 + 150, "#555555");
+
+    // Cacher le bouton systemctl au début (visible seulement si power.cfg a été lu)
+    sudoBtn.setVisible(this.powerCfgRead);
+
+    pwdBtn.on("pointerdown", () => {
+      this.executeCommand("pwd");
+      [dialogBg, title, hint, pwdBtn, lsBtn, catNetworkBtn, catBtn, sudoBtn, closeBtn].forEach(obj => obj.destroy());
+    });
 
     lsBtn.on("pointerdown", () => {
       this.executeCommand("ls");
-      [dialogBg, title, lsBtn, catBtn, sudoBtn, closeBtn].forEach(obj => obj.destroy());
+      [dialogBg, title, hint, pwdBtn, lsBtn, catNetworkBtn, catBtn, sudoBtn, closeBtn].forEach(obj => obj.destroy());
+    });
+
+    catNetworkBtn.on("pointerdown", () => {
+      this.executeCommand("cat network.conf");
+      [dialogBg, title, hint, pwdBtn, lsBtn, catNetworkBtn, catBtn, sudoBtn, closeBtn].forEach(obj => obj.destroy());
     });
 
     catBtn.on("pointerdown", () => {
       this.executeCommand("cat power.cfg");
-      [dialogBg, title, lsBtn, catBtn, sudoBtn, closeBtn].forEach(obj => obj.destroy());
+      [dialogBg, title, hint, pwdBtn, lsBtn, catNetworkBtn, catBtn, sudoBtn, closeBtn].forEach(obj => obj.destroy());
     });
 
     sudoBtn.on("pointerdown", () => {
       this.executeCommand("sudo systemctl start power-grid");
-      [dialogBg, title, lsBtn, catBtn, sudoBtn, closeBtn].forEach(obj => obj.destroy());
+      [dialogBg, title, hint, pwdBtn, lsBtn, catNetworkBtn, catBtn, sudoBtn, closeBtn].forEach(obj => obj.destroy());
     });
 
     closeBtn.on("pointerdown", () => {
-      [dialogBg, title, lsBtn, catBtn, sudoBtn, closeBtn].forEach(obj => obj.destroy());
+      [dialogBg, title, hint, pwdBtn, lsBtn, catNetworkBtn, catBtn, sudoBtn, closeBtn].forEach(obj => obj.destroy());
     });
   }
 
-  private createCommandButton(command: string, y: number, bgColor: string = "#27ae60"): Phaser.GameObjects.Text {
+  private createCommandButton(command: string, y: number, bgColor: string = "#34495e"): Phaser.GameObjects.Text {
     return this.add.text(
       this.scale.width / 2,
       y,
@@ -511,10 +554,17 @@ export class ComputerRoomSceneB extends Phaser.Scene {
   private executeCommand(command: string) {
     this.commandHistory.push(command);
 
-    if (command === "ls") {
+    if (command === "pwd") {
+      this.updateTerminalText("root@hospital:~$ pwd\n\n/root\n\nroot@hospital:~$ _");
+      this.showCommandResult("📂 Répertoire actuel\n\nVous êtes dans /root\nUtilisez 'ls' pour lister les fichiers.");
+    } else if (command === "ls") {
       this.updateTerminalText("root@hospital:~$ ls\n\npower.cfg\nnetwork.conf\nsystem.log\n\nroot@hospital:~$ _");
-      this.showCommandResult("📁 Fichiers listés\n\nVous voyez 'power.cfg' dans la liste.\nUtilisez 'cat power.cfg' pour le lire.");
+      this.showCommandResult("📁 Fichiers listés\n\nVous voyez plusieurs fichiers.\nExplorez-les avec 'cat <nom_fichier>'");
+    } else if (command === "cat network.conf") {
+      this.updateTerminalText("root@hospital:~$ cat network.conf\n\n# Network Configuration\n# Hospital LAN Settings\n\nIP: 192.168.1.100\nGateway: 192.168.1.1\nDNS: 8.8.8.8\n\nroot@hospital:~$ _");
+      this.showCommandResult("📄 Configuration réseau\n\nCe fichier contient les paramètres réseau.\nCe n'est pas ce que vous cherchez.");
     } else if (command === "cat power.cfg") {
+      this.powerCfgRead = true;
       this.updateTerminalText("root@hospital:~$ cat power.cfg\n\n# Power Grid Configuration\n# Emergency Generator Control\n\nPour réactiver le circuit :\nsudo systemctl start power-grid\n\nroot@hospital:~$ _");
       this.showCommandResult("📄 Fichier lu\n\nVous avez trouvé la commande pour\nréactiver le générateur !");
     } else if (command === "sudo systemctl start power-grid") {

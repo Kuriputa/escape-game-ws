@@ -38,7 +38,7 @@ export class ServerRoomScene extends Phaser.Scene {
     this.net.onEvent = (code, data) => {
       if (code === EVENT_CODES.PUZZLE_UPDATE) {
         // Recevoir la clé de chiffrement de Player B
-        if (data.type === "ENCRYPTION_KEY") {
+        if (data.type === "encryption_key_sent") {
           this.encryptionKey = data.key;
           this.hasReceivedKey = true;
           this.statusText?.setText(`Clé reçue de votre partenaire : ${this.encryptionKey}`);
@@ -51,60 +51,70 @@ export class ServerRoomScene extends Phaser.Scene {
       }
     };
 
-    // Créer la salle
-    this.createRoom();
-    this.createServerRacks();
-    this.createMainScreen();
-    this.createKeyInput();
-    this.createCodeInput();
-    this.createDoor();
-    this.createBackButton();
+    // Obtenir les dimensions de l'écran
+    const width = this.scale.width;
+    const height = this.scale.height;
 
-    // Message d'info
-    const infoText = this.add.text(400, 550, 
+    // Créer la salle
+    this.createRoom(width, height);
+    this.createServerRacks(width, height);
+    this.createMainScreen(width, height);
+    this.createKeyInput(width, height);
+    this.createCodeInput(width, height);
+    this.createDoor(width, height);
+    this.createBackButton(width, height);
+
+    // Message d'info - adapté à la taille
+    const infoText = this.add.text(width / 2, height - 35, 
       "Déchiffrez les données du serveur pour obtenir le code de la porte", 
       {
         fontSize: "16px",
-        color: "#aaaaaa",
+        color: "#ffff00",
+        backgroundColor: "#000000aa",
+        padding: { x: 15, y: 8 },
         align: "center",
-        wordWrap: { width: 700 }
+        wordWrap: { width: width * 0.8 }
       }
     ).setOrigin(0.5);
   }
 
-  private createRoom() {
+  private createRoom(width: number, height: number) {
     // Sol
-    const floor = this.add.rectangle(400, 500, 800, 200, 0x1a1a2e);
+    const floor = this.add.rectangle(width / 2, height * 0.85, width, height * 0.3, 0x1a1a2e);
     floor.setStrokeStyle(2, 0x16213e);
 
     // Murs
-    const wallLeft = this.add.rectangle(50, 300, 100, 600, 0x0f3460);
+    const wallLeft = this.add.rectangle(width * 0.05, height / 2, width * 0.1, height, 0x0f3460);
     wallLeft.setStrokeStyle(2, 0x16213e);
 
-    const wallRight = this.add.rectangle(750, 300, 100, 600, 0x0f3460);
+    const wallRight = this.add.rectangle(width * 0.95, height / 2, width * 0.1, height, 0x0f3460);
     wallRight.setStrokeStyle(2, 0x16213e);
 
     // Plafond
-    const ceiling = this.add.rectangle(400, 50, 800, 100, 0x0a2647);
+    const ceiling = this.add.rectangle(width / 2, height * 0.08, width, height * 0.16, 0x0a2647);
     ceiling.setStrokeStyle(2, 0x16213e);
 
     // Titre de la salle
-    this.add.text(400, 30, "SALLE SERVEUR", {
+    this.add.text(width / 2, 30, "SALLE SERVEUR", {
       fontSize: "28px",
       color: "#00d9ff",
       fontStyle: "bold"
     }).setOrigin(0.5);
   }
 
-  private createServerRacks() {
+  private createServerRacks(width: number, height: number) {
     // Rack de serveurs à gauche
+    const leftX = width * 0.15;
+    const startY = height * 0.2;
+    const spacing = height * 0.12;
+    
     for (let i = 0; i < 4; i++) {
-      const rack = this.add.rectangle(150, 150 + i * 80, 120, 70, 0x1e1e1e);
+      const rack = this.add.rectangle(leftX, startY + i * spacing, width * 0.15, height * 0.1, 0x1e1e1e);
       rack.setStrokeStyle(2, 0x00ff00);
 
       // LEDs clignotantes
       for (let j = 0; j < 3; j++) {
-        const led = this.add.circle(120 + j * 20, 150 + i * 80, 4, 0x00ff00);
+        const led = this.add.circle(leftX - width * 0.04 + j * 20, startY + i * spacing, 4, 0x00ff00);
         this.tweens.add({
           targets: led,
           alpha: 0.2,
@@ -115,20 +125,22 @@ export class ServerRoomScene extends Phaser.Scene {
       }
 
       // Label
-      this.add.text(150, 150 + i * 80, `SERVER-${i + 1}`, {
+      this.add.text(leftX, startY + i * spacing, `SERVER-${i + 1}`, {
         fontSize: "12px",
         color: "#00ff00"
       }).setOrigin(0.5);
     }
 
     // Rack de serveurs à droite
+    const rightX = width * 0.85;
+    
     for (let i = 0; i < 4; i++) {
-      const rack = this.add.rectangle(650, 150 + i * 80, 120, 70, 0x1e1e1e);
+      const rack = this.add.rectangle(rightX, startY + i * spacing, width * 0.15, height * 0.1, 0x1e1e1e);
       rack.setStrokeStyle(2, 0x00ff00);
 
       // LEDs clignotantes
       for (let j = 0; j < 3; j++) {
-        const led = this.add.circle(620 + j * 20, 150 + i * 80, 4, 0x00ff00);
+        const led = this.add.circle(rightX - width * 0.04 + j * 20, startY + i * spacing, 4, 0x00ff00);
         this.tweens.add({
           targets: led,
           alpha: 0.2,
@@ -139,34 +151,37 @@ export class ServerRoomScene extends Phaser.Scene {
       }
 
       // Label
-      this.add.text(650, 150 + i * 80, `SERVER-${i + 5}`, {
+      this.add.text(rightX, startY + i * spacing, `SERVER-${i + 5}`, {
         fontSize: "12px",
         color: "#00ff00"
       }).setOrigin(0.5);
     }
   }
 
-  private createMainScreen() {
+  private createMainScreen(width: number, height: number) {
     // Écran principal au centre
-    const screen = this.add.rectangle(400, 200, 300, 200, 0x000000);
-    screen.setStrokeStyle(3, 0x00d9ff);
+    const centerX = width / 2;
+    const screenY = height * 0.18;
+    
+    const screen = this.add.rectangle(centerX, screenY, width * 0.4, height * 0.25, 0x000000);
+    screen.setStrokeStyle(4, 0x00d9ff);
 
     // Titre de l'écran
-    this.add.text(400, 120, "TERMINAL PRINCIPAL", {
-      fontSize: "18px",
+    this.add.text(centerX, height * 0.08, "TERMINAL PRINCIPAL", {
+      fontSize: "20px",
       color: "#00d9ff",
       fontStyle: "bold"
     }).setOrigin(0.5);
 
     // Chemin du fichier
-    this.add.text(260, 140, "/data/keys/door.enc", {
-      fontSize: "14px",
+    this.add.text(centerX - width * 0.18, height * 0.12, "/data/keys/door.enc", {
+      fontSize: "15px",
       color: "#00ff00"
     });
 
     // Texte chiffré
-    const encryptedDisplay = this.add.text(400, 180, this.encryptedText, {
-      fontSize: "20px",
+    const encryptedDisplay = this.add.text(centerX, screenY - height * 0.02, this.encryptedText, {
+      fontSize: "22px",
       color: "#ff0000",
       fontStyle: "bold",
       fontFamily: "monospace"
@@ -182,52 +197,61 @@ export class ServerRoomScene extends Phaser.Scene {
     });
 
     // Texte d'état
-    this.statusText = this.add.text(400, 220, "En attente de la clé de déchiffrement...", {
-      fontSize: "14px",
+    this.statusText = this.add.text(centerX, screenY + height * 0.05, "En attente de la clé de déchiffrement...", {
+      fontSize: "15px",
       color: "#ffaa00",
       align: "center",
-      wordWrap: { width: 280 }
+      wordWrap: { width: width * 0.35 }
     }).setOrigin(0.5);
 
     // Note explicative
-    this.add.text(400, 260, "Fichier chiffré détecté", {
-      fontSize: "12px",
+    this.add.text(centerX, screenY + height * 0.11, "Fichier chiffré détecté", {
+      fontSize: "13px",
       color: "#888888",
       fontStyle: "italic"
     }).setOrigin(0.5);
   }
 
-  private createKeyInput() {
+  private createKeyInput(width: number, height: number) {
     // Zone de saisie de la clé
-    const inputBox = this.add.rectangle(400, 340, 300, 50, 0x1a1a2e);
-    inputBox.setStrokeStyle(2, 0x00d9ff);
+    const centerX = width / 2;
+    const inputY = height * 0.38;
+    
+    const inputBox = this.add.rectangle(centerX, inputY, width * 0.4, height * 0.08, 0x1a1a2e);
+    inputBox.setStrokeStyle(3, 0x00d9ff);
     inputBox.setInteractive({ useHandCursor: true });
 
-    this.add.text(400, 310, "Entrez la clé de déchiffrement :", {
-      fontSize: "14px",
-      color: "#ffffff"
+    this.add.text(centerX, inputY - height * 0.05, "Entrez la clé de déchiffrement :", {
+      fontSize: "15px",
+      color: "#ffffff",
+      fontStyle: "bold"
     }).setOrigin(0.5);
 
-    this.keyInputText = this.add.text(400, 340, "", {
-      fontSize: "18px",
+    this.keyInputText = this.add.text(centerX, inputY, "", {
+      fontSize: "20px",
       color: "#00ff00",
       fontFamily: "monospace"
     }).setOrigin(0.5);
 
     // Clavier virtuel simplifié
     const keyboard = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let keyX = 150;
-    let keyY = 390;
+    const keySize = Math.min(width * 0.04, 34);
+    const keySpacing = keySize + 8;
+    const keysPerRow = 13;
+    const startX = centerX - (keysPerRow * keySpacing) / 2 + keySpacing / 2;
+    let keyX = startX;
+    let keyY = height * 0.48;
     
     for (let i = 0; i < keyboard.length; i++) {
       const char = keyboard[i];
-      const keyBtn = this.add.rectangle(keyX, keyY, 30, 30, 0x0f3460);
-      keyBtn.setStrokeStyle(1, 0x00d9ff);
+      const keyBtn = this.add.rectangle(keyX, keyY, keySize, keySize, 0x0f3460);
+      keyBtn.setStrokeStyle(2, 0x00d9ff);
       keyBtn.setInteractive({ useHandCursor: true });
 
       const keyText = this.add.text(keyX, keyY, char, {
-        fontSize: "14px",
-        color: "#ffffff"
+        fontSize: "15px",
+        color: "#ffffff",
+        fontStyle: "bold"
       }).setOrigin(0.5);
 
       keyBtn.on("pointerdown", () => {
@@ -247,21 +271,23 @@ export class ServerRoomScene extends Phaser.Scene {
         keyBtn.setFillStyle(0x0f3460);
       });
 
-      keyX += 35;
-      if ((i + 1) % 13 === 0) {
-        keyX = 150;
-        keyY += 35;
+      keyX += keySpacing;
+      if ((i + 1) % keysPerRow === 0) {
+        keyX = startX;
+        keyY += keySpacing;
       }
     }
 
     // Bouton Effacer
-    const clearBtn = this.add.rectangle(250, 470, 80, 30, 0xff6b6b);
-    clearBtn.setStrokeStyle(2, 0xff0000);
+    const btnY = height * 0.62;
+    const clearBtn = this.add.rectangle(centerX - width * 0.15, btnY, width * 0.12, height * 0.06, 0xff6b6b);
+    clearBtn.setStrokeStyle(3, 0xff0000);
     clearBtn.setInteractive({ useHandCursor: true });
 
-    this.add.text(250, 470, "EFFACER", {
-      fontSize: "12px",
-      color: "#ffffff"
+    this.add.text(centerX - width * 0.15, btnY, "EFFACER", {
+      fontSize: "14px",
+      color: "#ffffff",
+      fontStyle: "bold"
     }).setOrigin(0.5);
 
     clearBtn.on("pointerdown", () => {
@@ -279,13 +305,14 @@ export class ServerRoomScene extends Phaser.Scene {
     });
 
     // Bouton Valider
-    const validateBtn = this.add.rectangle(550, 470, 80, 30, 0x4ecdc4);
-    validateBtn.setStrokeStyle(2, 0x00d9ff);
+    const validateBtn = this.add.rectangle(centerX + width * 0.15, btnY, width * 0.12, height * 0.06, 0x4ecdc4);
+    validateBtn.setStrokeStyle(3, 0x00d9ff);
     validateBtn.setInteractive({ useHandCursor: true });
 
-    this.add.text(550, 470, "VALIDER", {
-      fontSize: "12px",
-      color: "#ffffff"
+    this.add.text(centerX + width * 0.15, btnY, "VALIDER", {
+      fontSize: "14px",
+      color: "#ffffff",
+      fontStyle: "bold"
     }).setOrigin(0.5);
 
     validateBtn.on("pointerdown", () => {
@@ -305,6 +332,8 @@ export class ServerRoomScene extends Phaser.Scene {
     if (!this.keyInputText || this.isDecrypted) return;
 
     const enteredKey = this.keyInputText.text;
+    const width = this.scale.width;
+    const height = this.scale.height;
 
     if (enteredKey === this.encryptionKey && this.hasReceivedKey) {
       // Clé correcte !
@@ -312,8 +341,9 @@ export class ServerRoomScene extends Phaser.Scene {
       this.statusText?.setText("✓ Déchiffrement réussi !");
       this.statusText?.setColor("#00ff00");
 
-      // Afficher le code déchiffré
-      const decryptedDisplay = this.add.text(400, 180, this.decryptedCode, {
+      // Afficher le code déchiffré sous le texte chiffré (dans l'écran principal)
+      const screenY = height * 0.18;
+      const decryptedDisplay = this.add.text(width / 2, screenY + height * 0.05, this.decryptedCode, {
         fontSize: "32px",
         color: "#00ff00",
         fontStyle: "bold",
@@ -328,8 +358,8 @@ export class ServerRoomScene extends Phaser.Scene {
         duration: 500
       });
 
-      // Message
-      this.add.text(400, 220, "Code d'accès obtenu : entrez-le ci-dessous", {
+      // Message sous le code déchiffré
+      this.add.text(width / 2, screenY + height * 0.1, "Code d'accès obtenu : entrez-le ci-dessous", {
         fontSize: "14px",
         color: "#00ff00"
       }).setOrigin(0.5);
@@ -344,32 +374,40 @@ export class ServerRoomScene extends Phaser.Scene {
     }
   }
 
-  private createCodeInput() {
+  private createCodeInput(width: number, height: number) {
     // Zone de saisie du code (visible après déchiffrement)
-    const codeBox = this.add.rectangle(400, 520, 200, 40, 0x1a1a2e);
-    codeBox.setStrokeStyle(2, 0x00d9ff);
+    const centerX = width / 2;
+    const codeY = height * 0.72;
+    
+    const codeBox = this.add.rectangle(centerX, codeY, width * 0.28, height * 0.08, 0x1a1a2e);
+    codeBox.setStrokeStyle(3, 0x00d9ff);
     codeBox.setInteractive({ useHandCursor: true });
 
-    this.add.text(400, 495, "Code de la porte :", {
-      fontSize: "14px",
-      color: "#ffffff"
+    this.add.text(centerX, codeY - height * 0.04, "Code de la porte :", {
+      fontSize: "15px",
+      color: "#ffffff",
+      fontStyle: "bold"
     }).setOrigin(0.5);
 
-    this.codeInputText = this.add.text(400, 520, "", {
-      fontSize: "20px",
+    this.codeInputText = this.add.text(centerX, codeY, "", {
+      fontSize: "24px",
       color: "#00ff00",
-      fontFamily: "monospace"
+      fontFamily: "monospace",
+      fontStyle: "bold"
     }).setOrigin(0.5);
 
     // Pavé numérique
     const numpad = "123456789C0V";
-    let numX = 320;
-    let numY = 560;
+    const numSize = Math.min(width * 0.05, 42);
+    const numSpacing = numSize + 8;
+    const startX = centerX - numSpacing * 1.5 + numSpacing / 2;
+    let numX = startX;
+    let numY = height * 0.81;
 
     for (let i = 0; i < numpad.length; i++) {
       const char = numpad[i];
-      const numBtn = this.add.rectangle(numX, numY, 35, 35, 0x0f3460);
-      numBtn.setStrokeStyle(1, 0x00d9ff);
+      const numBtn = this.add.rectangle(numX, numY, numSize, numSize, 0x0f3460);
+      numBtn.setStrokeStyle(2, 0x00d9ff);
       numBtn.setInteractive({ useHandCursor: true });
 
       let displayChar = char;
@@ -377,8 +415,9 @@ export class ServerRoomScene extends Phaser.Scene {
       if (char === "V") displayChar = "✓";
 
       const numText = this.add.text(numX, numY, displayChar, {
-        fontSize: "16px",
-        color: "#ffffff"
+        fontSize: "20px",
+        color: "#ffffff",
+        fontStyle: "bold"
       }).setOrigin(0.5);
 
       numBtn.on("pointerdown", () => {
@@ -407,10 +446,10 @@ export class ServerRoomScene extends Phaser.Scene {
         numBtn.setFillStyle(0x0f3460);
       });
 
-      numX += 40;
+      numX += numSpacing;
       if ((i + 1) % 3 === 0) {
-        numX = 320;
-        numY += 40;
+        numX = startX;
+        numY += numSpacing;
       }
     }
   }
@@ -419,6 +458,8 @@ export class ServerRoomScene extends Phaser.Scene {
     if (!this.codeInputText || this.doorUnlocked || !this.isDecrypted) return;
 
     const enteredCode = this.codeInputText.text;
+    const width = this.scale.width;
+    const height = this.scale.height;
 
     if (enteredCode === this.decryptedCode) {
       // Code correct !
@@ -429,7 +470,7 @@ export class ServerRoomScene extends Phaser.Scene {
       this.doorText?.setColor("#00ff00");
 
       // Son de succès (visuel)
-      const successMsg = this.add.text(400, 300, "✓ ACCÈS AUTORISÉ", {
+      const successMsg = this.add.text(width / 2, height * 0.5, "✓ ACCÈS AUTORISÉ", {
         fontSize: "24px",
         color: "#00ff00",
         fontStyle: "bold"
@@ -438,7 +479,7 @@ export class ServerRoomScene extends Phaser.Scene {
       this.tweens.add({
         targets: successMsg,
         alpha: 0,
-        y: 250,
+        y: height * 0.42,
         duration: 2000,
         onComplete: () => successMsg.destroy()
       });
@@ -448,7 +489,7 @@ export class ServerRoomScene extends Phaser.Scene {
       this.codeInputText.setColor("#ff0000");
       this.codeInputText.setText("");
 
-      const errorMsg = this.add.text(400, 300, "❌ CODE INCORRECT", {
+      const errorMsg = this.add.text(width / 2, height * 0.5, "❌ CODE INCORRECT", {
         fontSize: "20px",
         color: "#ff0000",
         fontStyle: "bold"
@@ -463,18 +504,23 @@ export class ServerRoomScene extends Phaser.Scene {
     }
   }
 
-  private createDoor() {
+  private createDoor(width: number, height: number) {
     // Porte vers WaitingRoomScene (en haut à droite)
-    const door = this.add.rectangle(700, 150, 80, 120, 0x8b4513);
+    const doorX = width * 0.88;
+    const doorY = height * 0.25;
+    const doorWidth = Math.min(width * 0.1, 80);
+    const doorHeight = Math.min(height * 0.2, 120);
+    
+    const door = this.add.rectangle(doorX, doorY, doorWidth, doorHeight, 0x8b4513);
     door.setStrokeStyle(3, 0xff0000);
 
-    const doorHandle = this.add.circle(680, 150, 8, 0xffd700);
+    const doorHandle = this.add.circle(doorX - doorWidth * 0.25, doorY, 8, 0xffd700);
 
-    this.doorText = this.add.text(700, 150, "VERROUILLÉE", {
+    this.doorText = this.add.text(doorX, doorY, "VERROUILLÉE", {
       fontSize: "12px",
       color: "#ff0000",
       align: "center",
-      wordWrap: { width: 70 }
+      wordWrap: { width: doorWidth - 10 }
     }).setOrigin(0.5);
 
     door.setInteractive({ useHandCursor: true });
@@ -485,7 +531,7 @@ export class ServerRoomScene extends Phaser.Scene {
           this.scene.start("WaitingRoomScene", { net: this.net, story: this.story });
         });
       } else {
-        const msg = this.add.text(700, 200, "Porte verrouillée !\nEntrez le code.", {
+        const msg = this.add.text(doorX, doorY + doorHeight * 0.6, "Porte verrouillée !\nEntrez le code.", {
           fontSize: "14px",
           color: "#ff6b6b",
           align: "center"
@@ -515,12 +561,17 @@ export class ServerRoomScene extends Phaser.Scene {
     });
   }
 
-  private createBackButton() {
-    const backBtn = this.add.rectangle(50, 550, 80, 40, 0x444444);
+  private createBackButton(width: number, height: number) {
+    const btnX = width * 0.08;
+    const btnY = height * 0.92;
+    const btnWidth = Math.min(width * 0.1, 80);
+    const btnHeight = Math.min(height * 0.07, 40);
+    
+    const backBtn = this.add.rectangle(btnX, btnY, btnWidth, btnHeight, 0x444444);
     backBtn.setStrokeStyle(2, 0x888888);
     backBtn.setInteractive({ useHandCursor: true });
 
-    this.add.text(50, 550, "← RETOUR", {
+    this.add.text(btnX, btnY, "← RETOUR", {
       fontSize: "14px",
       color: "#ffffff"
     }).setOrigin(0.5);
